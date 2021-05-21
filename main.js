@@ -43,6 +43,17 @@ function main(event){
             grid[gridY][gridX] = "o" //record that an o was played where it was
             turn = "x"
         }
+        winnerCheck = winner(grid)
+        if(winnerCheck == "x" || winnerCheck == "o"){
+            popup("text", "WINNER", "The winner is "+winnerCheck, "play again", function(){
+                location.reload()
+            })
+        }
+        if(winnerCheck == "tie"){
+            popup("text", "TIE", "The game is tied", "play again", function(){
+                location.reload()
+            })
+        }
     }
 }
 function winner(board){ //returns the winner, tie, or 0
@@ -51,10 +62,56 @@ function winner(board){ //returns the winner, tie, or 0
         if(board[1][1] == symbolToCheck){ //if the center of the grid is the symbol that is being checked
             for(i=0;i<3;i++){ //3 times
                 for(n=0;n<3;n++){ //3 time
-                    if(board[n][i] == symbolToCheck && board[2-n][2-i] == symbolToCheck){return(symbolToCheck)} //if two of the symbols being checked are oposite return the symbol being checked
+                    if(board[n][i] == symbolToCheck && board[2-n][2-i] == symbolToCheck && (n,i) != (1,1)){return(symbolToCheck)} //if two of the symbols being checked are oposite return the symbol being checked
                 }
             }
         }
-        symbolToCheck = "o"
+        var horizontalLine
+        var verticalLine
+        for(i = 0; i < 3; i++){ //3 time
+            horizontalLine = 0
+            verticalLine = 0
+            for(n = 0; n < 3; n++){ //3 times
+                if(board[i][n] == symbolToCheck){ //if there is the symbol being checked in n position on a horizontal line
+                    horizontalLine += 1
+                    if(horizontalLine == 3){ // if there are 3 on the same horizontal line
+                        return(symbolToCheck) //return the winner
+                    }
+                }
+                if(board[n][i] == symbolToCheck){ //if there is the symbol being checked in n position on a vertical line
+                    verticalLine += 1
+                    if(verticalLine == 3){ // if there are 3 on the same vertical line
+                        return(symbolToCheck) //return the winner
+                    }
+                }
+            }
+        }
+
+        symbolToCheck = "o" //now it will check for o instead of x
     }
+    for(i=0;i<3;i++){ //3 times
+        for(n=0;n<3;n++){ //3 time
+            if(board[i][n] == 0){ // if there is a spot that has not been played in
+                return(0) //return that no one has won this turn
+            }
+        }
+    }
+    return("tie") //if nothing has been returned up to this point return that the game cannot be won
+}
+popUpFunction = "none"
+function popup(type, title, content, prompt, onclose="none"){
+    popUpFunction = onclose //make a global variable with the function in it
+    $("#popupTitle").html(title)
+    $("#popupText").html(content)
+    if(type == "text"){ //if the popup type is text
+        $("#popupButton").html(prompt) //make a button [TODO]
+    }
+    $("#popup").css("visibility", "visible") //show the popup
+
+}
+function closePopup(){
+    if(popUpFunction != "none"){ //if a function has been given
+        popUpFunction() //run it
+    }
+    $("#popup").css("visibility", "hidden") //close the popup
 }
