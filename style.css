@@ -23,9 +23,8 @@ canvas{
 #popupText{
     font-size: 2vh;
 }
-#popupButton{
+#popupButtons{
     position: absolute;
     bottom: 1vh;
-    left: 11vw;
-    width: 8vw;
+    left: 40%;
 }

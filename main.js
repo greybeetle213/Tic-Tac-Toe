@@ -5,6 +5,7 @@ function init(){
     ctx = document.getElementById("screen").getContext("2d")
     ctx.fillStyle = "black"
     ctx.lineWidth = CANVAS_SIZE/100
+    ai = true
     turn = "x" //whether X or O is playing this turn
     $("#screen").click(function(event){main(event)}) //run the main function when the canvas is click
     grid = [
@@ -36,7 +37,7 @@ function main(event){
             ctx.stroke()
             grid[gridY][gridX] = "x" //record that an x was played where it was
             turn = "o"
-        }else{ // if its O turn 
+        }else if(!ai){ // if its O turn 
             ctx.beginPath() //draw an O
             ctx.arc(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/6,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
             ctx.stroke()
@@ -45,12 +46,12 @@ function main(event){
         }
         winnerCheck = winner(grid)
         if(winnerCheck == "x" || winnerCheck == "o"){
-            popup("text", "WINNER", "The winner is "+winnerCheck, "play again", function(){
+            popup.alert("WINNER", "The winner is "+winnerCheck, "play again", function(){
                 location.reload()
             })
         }
         if(winnerCheck == "tie"){
-            popup("text", "TIE", "The game is tied", "play again", function(){
+            popup.alert("TIE", "The game is tied", "play again", function(){
                 location.reload()
             })
         }
@@ -98,20 +99,34 @@ function winner(board){ //returns the winner, tie, or 0
     }
     return("tie") //if nothing has been returned up to this point return that the game cannot be won
 }
-popUpFunction = "none"
-function popup(type, title, content, prompt, onclose="none"){
-    popUpFunction = onclose //make a global variable with the function in it
-    $("#popupTitle").html(title)
-    $("#popupText").html(content)
-    if(type == "text"){ //if the popup type is text
-        $("#popupButton").html(prompt) //make a button [TODO]
+function ai_move(){
+    var Spaces = []
+    var maxScore = 1
+    tempGrid = [...grid]
+    for(c=0;c<3;c++){ //for each colem
+        for(r=0;r<3;r++){ //for each row
+            if(grid[c][r] == 0){ //if the space is empty
+                Spaces.push([c,r,1]) // add it to the list of spaces whith a score of one
+                tempGrid = JSON.parse(JSON.stringify(grid)) //make a clone, not referance of grid
+                tempGrid[c][r] = "o"
+                if(winner(tempGrid) == "o"){
+                    Spaces[Spaces.length-1][2] = 1000
+                    maxScore = 1000
+                }
+                console.log(Spaces)
+            }
+        }
     }
-    $("#popup").css("visibility", "visible") //show the popup
+    for(i=0;i<maxScore;i++){
+        if(Spaces[i][2] == maxScore){
+            space = Spaces[i]
+            break
+        }
+    } 
+    ctx.beginPath() //draw an O
+    ctx.arc(space[1]*(CANVAS_SIZE/3)+CANVAS_SIZE/6,space[0]*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
+    ctx.stroke()
+    console.log(grid)
+    grid[space[0]][space[1]] = "o" //record where the ai played an o
 
-}
-function closePopup(){
-    if(popUpFunction != "none"){ //if a function has been given
-        popUpFunction() //run it
-    }
-    $("#popup").css("visibility", "hidden") //close the popup
 }
