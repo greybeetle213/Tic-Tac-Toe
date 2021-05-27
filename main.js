@@ -36,7 +36,11 @@ function main(event){
             ctx.lineTo(gridX*(CANVAS_SIZE/3),gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/3) // draw a line to the bottom left corner
             ctx.stroke()
             grid[gridY][gridX] = "x" //record that an x was played where it was
-            turn = "o"
+            if(ai && winner(grid) == 0){
+                ai_move()
+            }else{
+                turn = "o"
+            }
         }else if(!ai){ // if its O turn 
             ctx.beginPath() //draw an O
             ctx.arc(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/6,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
@@ -101,32 +105,64 @@ function winner(board){ //returns the winner, tie, or 0
 }
 function ai_move(){
     var Spaces = []
-    var maxScore = 1
-    tempGrid = [...grid]
+    var maxScore = 0
+    var tempGrid //fake grid
+    var subTempGrid
     for(c=0;c<3;c++){ //for each colem
         for(r=0;r<3;r++){ //for each row
             if(grid[c][r] == 0){ //if the space is empty
-                Spaces.push([c,r,1]) // add it to the list of spaces whith a score of one
+                Spaces.push([c,r,0]) // add it to the list of spaces whith a score of one
                 tempGrid = JSON.parse(JSON.stringify(grid)) //make a clone, not referance of grid
-                tempGrid[c][r] = "o"
-                if(winner(tempGrid) == "o"){
-                    Spaces[Spaces.length-1][2] = 1000
-                    maxScore = 1000
+                tempGrid[c][r] = "o" //change a sqaure in the fake grid
+                if(winner(tempGrid) == "o"){ // if you would win in the fake grid
+                    Spaces[Spaces.length-1][2] = 1000 // add enough to that places score that it will always play there
                 }
-                console.log(Spaces)
+                subTempGrid = JSON.parse(JSON.stringify(tempGrid)) //make a clone, not referance of grid
+                for(c2=0;c2<3;c2++){ // for each colem
+                    for(r2=0;r2<3;r2++){ //for each row
+                        subTempGrid = JSON.parse(JSON.stringify(tempGrid)) //make a clone of the fake grid
+                        if(subTempGrid[c2][r2] == 0){ // if the space in the fake grid is empty
+                            subTempGrid[c2][r2] = "o" // set the space in the new fake grid to "o"
+                            if(winner(subTempGrid) == "o"){ // if you win in this senario
+                                Spaces[Spaces.length-1][2] += 150 // add 150 to the score of that tile
+                            }
+                        }
+                    }
+                }
+                tempGrid = JSON.parse(JSON.stringify(grid)) //make a clone, not referance of grid
+                tempGrid[c][r] = "x" //set a sqaure in it to x
+                if(winner(tempGrid) == "x"){ // if x wins in this senario
+                    Spaces[Spaces.length-1][2] = 500 // increase the score to the point that it will always play here, unless it can win
+                }
+                subTempGrid = JSON.parse(JSON.stringify(tempGrid)) // make a clone of the clone of grid
+                for(c2=0;c2<3;c2++){ //for each colem
+                    for(r2=0;r2<3;r2++){ // for each row
+                        subTempGrid = JSON.parse(JSON.stringify(tempGrid)) // reset the clone of the grid
+                        if(subTempGrid[c2][r2] == 0){ // if the tile is empty
+                            subTempGrid[c2][r2] = "x" //set the space in the fake grid to "x"
+                            if(winner(subTempGrid) == "x"){  // if x wins in this senario
+                                Spaces[Spaces.length-1][2] += 100 // add 100 the the score of this tile
+                            }
+                        }
+                    }
+                }
+                if(Spaces[Spaces.length-1][2] > maxScore){ //if the score of this tile is more that the previos max score
+                    maxScore = Spaces[Spaces.length-1][2] // updtate the max score
+                }
             }
         }
     }
-    for(i=0;i<maxScore;i++){
-        if(Spaces[i][2] == maxScore){
-            space = Spaces[i]
-            break
+    console.log(Spaces) //log the spaces and their scores to console
+    Spaces.sort(() => (Math.random() > .5) ? 1 : -1)//https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+    for(i=0;i<Spaces.length;i++){ // for every tile that can be player=d in
+        if(Spaces[i][2] == maxScore){ // if the score of the tile is the highest score of any tile
+            space = Spaces[i] // set the space that will be played in to this space
+            break //end the loop
         }
     } 
     ctx.beginPath() //draw an O
     ctx.arc(space[1]*(CANVAS_SIZE/3)+CANVAS_SIZE/6,space[0]*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
     ctx.stroke()
-    console.log(grid)
     grid[space[0]][space[1]] = "o" //record where the ai played an o
 
 }
