@@ -28,3 +28,15 @@ canvas{
     bottom: 1vh;
     left: 40%;
 }
+#popupInput{
+    width: 60%;
+}
+#scores{
+    width: 10%;
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    background-color: white;
+    border: 5px inset black;
+    font-size: x-large;
+}

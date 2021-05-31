@@ -5,59 +5,72 @@ function init(){
     ctx = document.getElementById("screen").getContext("2d")
     ctx.fillStyle = "black"
     ctx.lineWidth = CANVAS_SIZE/100
-    ai = true
     turn = "x" //whether X or O is playing this turn
     $("#screen").click(function(event){main(event)}) //run the main function when the canvas is click
-    grid = [
-        [0,0,0],
-        [0,0,0],
-        [0,0,0]
-    ]
-    ctx.beginPath()
-    for(i = 1; i != 3; i ++){ //draw grid
-        ctx.moveTo(0,CANVAS_SIZE/3*i)
-        ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE/3*i)
-        ctx.moveTo(CANVAS_SIZE/3*i,0)
-        ctx.lineTo(CANVAS_SIZE/3*i, CANVAS_SIZE)
-    }
-    ctx.stroke()
+    inMenu = true
+    clear_grid()
+    popup.confirm("Player Count", "how many players do you want?", "one", "two", 
+    function(){ //if the player chooses one
+        ai = true //whether the second player is an ai
+        inMenu = false
+    },
+    function(){ //if the player chooses two
+        ai = false //whether the second player is an ai
+        popup.input("Name", "what is the player who will use Xs name?", function(text){
+            $("#xName").html(text)
+            popup.input("Name", "what is the player who will use Os name?", function(text){
+                $("#oName").html(text)
+                inMenu = false
+            })
+        })
+    })
 }
 function main(event){
-    x = event.pageX - $("#screen").offset().left //get the x pos relitive to the canvas
-    y = event.pageY
-    gridX = Math.floor(x/(CANVAS_SIZE/3)) // get item in grid that will be changed 
-    gridY = Math.floor(y/(CANVAS_SIZE/3))
-    if(grid[gridY][gridX] == 0){
-        if(turn == "x"){
-            ctx.beginPath() //draw an X
-            ctx.moveTo(gridX*(CANVAS_SIZE/3),gridY*(CANVAS_SIZE/3)) //move to the top left corner of the sqaure
-            ctx.lineTo(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/3,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/3)// draw a line to the bottom right corner
-            ctx.moveTo(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/3,gridY*(CANVAS_SIZE/3)) // move to the top right corner
-            ctx.lineTo(gridX*(CANVAS_SIZE/3),gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/3) // draw a line to the bottom left corner
-            ctx.stroke()
-            grid[gridY][gridX] = "x" //record that an x was played where it was
-            if(ai && winner(grid) == 0){
-                ai_move()
-            }else{
-                turn = "o"
+    if(!inMenu){
+        x = event.pageX - $("#screen").offset().left //get the x pos relitive to the canvas
+        y = event.pageY
+        gridX = Math.floor(x/(CANVAS_SIZE/3)) // get item in grid that will be changed 
+        gridY = Math.floor(y/(CANVAS_SIZE/3))
+        if(grid[gridY][gridX] == 0){
+            if(turn == "x"){
+                ctx.beginPath() //draw an X
+                ctx.moveTo(gridX*(CANVAS_SIZE/3),gridY*(CANVAS_SIZE/3)) //move to the top left corner of the sqaure
+                ctx.lineTo(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/3,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/3)// draw a line to the bottom right corner
+                ctx.moveTo(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/3,gridY*(CANVAS_SIZE/3)) // move to the top right corner
+                ctx.lineTo(gridX*(CANVAS_SIZE/3),gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/3) // draw a line to the bottom left corner
+                ctx.stroke()
+                grid[gridY][gridX] = "x" //record that an x was played where it was
+                if(ai && winner(grid) == 0){
+                    ai_move()
+                }
+                if(!ai){
+                    turn = "o"
+                }
+            }else if(!ai){ // if its O turn 
+                ctx.beginPath() //draw an O
+                ctx.arc(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/6,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
+                ctx.stroke()
+                grid[gridY][gridX] = "o" //record that an o was played where it was
+                turn = "x"
             }
-        }else if(!ai){ // if its O turn 
-            ctx.beginPath() //draw an O
-            ctx.arc(gridX*(CANVAS_SIZE/3)+CANVAS_SIZE/6,gridY*(CANVAS_SIZE/3)+CANVAS_SIZE/6, CANVAS_SIZE/6, 0, 2 * Math.PI);
-            ctx.stroke()
-            grid[gridY][gridX] = "o" //record that an o was played where it was
-            turn = "x"
-        }
-        winnerCheck = winner(grid)
-        if(winnerCheck == "x" || winnerCheck == "o"){
-            popup.alert("WINNER", "The winner is "+winnerCheck, "play again", function(){
-                location.reload()
-            })
-        }
-        if(winnerCheck == "tie"){
-            popup.alert("TIE", "The game is tied", "play again", function(){
-                location.reload()
-            })
+            winnerCheck = winner(grid)
+            if(winnerCheck == "x" || winnerCheck == "o"){
+                inMenu = true
+                $("#"+winnerCheck+"Score").html(Number($("#"+winnerCheck+"Score").html())+1)
+                popup.alert("WINNER", "The winner is "+winnerCheck, "play again", function(){
+                    clear_grid()
+                    inMenu = false
+                })
+            }
+            if(winnerCheck == "tie"){
+                inMenu = true
+                $("#oScore").html(Number($("#oScore").html())+1)
+                $("#xScore").html(Number($("#xScore").html())+1)
+                popup.alert("TIE", "The game is tied", "play again", function(){
+                    clear_grid()
+                    inMenu = false
+                })
+            }
         }
     }
 }
@@ -165,4 +178,20 @@ function ai_move(){
     ctx.stroke()
     grid[space[0]][space[1]] = "o" //record where the ai played an o
 
+}
+function clear_grid(){
+    grid = [
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
+    ]
+    ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE)
+    ctx.beginPath()
+    for(i = 1; i != 3; i ++){ //draw grid
+        ctx.moveTo(0,CANVAS_SIZE/3*i)
+        ctx.lineTo(CANVAS_SIZE, CANVAS_SIZE/3*i)
+        ctx.moveTo(CANVAS_SIZE/3*i,0)
+        ctx.lineTo(CANVAS_SIZE/3*i, CANVAS_SIZE)
+    }
+    ctx.stroke()
 }
