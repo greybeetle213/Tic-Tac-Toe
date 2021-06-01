@@ -1,3 +1,4 @@
+
 function closePopup(popUpFunction){
     $("#popup").css("visibility", "hidden") //close the popup
     if(popUpFunction != ""){ //if a function has been given
@@ -8,13 +9,15 @@ popup = {
     alert:function(title, content, prompt="close", onclose="") {
         $("#popupTitle").html(title)
         $("#popupText").html(content)
-        $("#popupButtons").html("<button id='popupButton' onclick='closePopup("+onclose+")'>"+prompt+"</button>") //make a button
+        $("#popupButtons").html("<button id='popupButton' onclick='closePopup("+onclose.toString()+")'>"+prompt.toString()+"</button>") //make a button
         $("#popup").css("visibility", "visible") //show the popup
     },
-    confirm:function(title,content,accept,deny,on_accept="",on_deny=""){
+    confirm:function(title,content,accept,deny,onAccept="",onDeny=""){
         $("#popupTitle").html(title)
         $("#popupText").html(content)
-        $("#popupButtons").html("<button id='popupButton' onclick='closePopup("+on_accept+")'>"+accept+"</button> <button id='popupButton2' onclick='closePopup("+on_deny+")'>"+deny+"</button>")
+        globalOnAccept = onAccept
+        globalOnDeny = onDeny
+        $("#popupButtons").html("<button id='popupButton' onclick='closePopup(globalOnAccept)'>"+accept+"</button> <button id='popupButton2' onclick='closePopup(globalOnDeny)'>"+deny+"</button>")
         $("#popup").css("visibility", "visible") //show the popup
     },
     input:function(title,content,on_enter=""){

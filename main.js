@@ -17,8 +17,17 @@ function init(){
     function(){ //if the player chooses two
         ai = false //whether the second player is an ai
         popup.input("Name", "what is the player who will use Xs name?", function(text){
+            text = text.replace(/\W/g, '') //https://stackoverflow.com/questions/9364400/remove-not-alphanumeric-characters-from-string
+            if(text.length > 10){ //if the name player one inputed more that 10 chars
+                text = text.slice(0,10) //cut the end off
+                text = text + "..." //and replace it with ...
+            }
             $("#xName").html(text)
             popup.input("Name", "what is the player who will use Os name?", function(text){
+                if(text.length > 10){ //if the name player two inputed more that 10 chars
+                    text = text.slice(0,10) //cut the end off
+                    text = text + "..." //and replace it with ...
+                }
                 $("#oName").html(text)
                 inMenu = false
             })
