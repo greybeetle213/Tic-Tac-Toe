@@ -40,3 +40,8 @@ canvas{
     border: 5px inset black;
     font-size: x-large;
 }
+#restartButton{
+    position: absolute;
+    float: left;
+    top: 15%;
+}

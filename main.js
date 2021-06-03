@@ -8,26 +8,19 @@ function init(){
     turn = "x" //whether X or O is playing this turn
     $("#screen").click(function(event){main(event)}) //run the main function when the canvas is click
     inMenu = true
+    whoGoesFirst = "x" //changes every round
     clear_grid()
     popup.confirm("Player Count", "how many players do you want?", "one", "two", 
     function(){ //if the player chooses one
         ai = true //whether the second player is an ai
         inMenu = false
+        popup.alert("", "you are X, you move first.", "start game")
     },
     function(){ //if the player chooses two
         ai = false //whether the second player is an ai
-        popup.input("Name", "what is the player who will use Xs name?", function(text){
-            text = text.replace(/\W/g, '') //https://stackoverflow.com/questions/9364400/remove-not-alphanumeric-characters-from-string
-            if(text.length > 10){ //if the name player one inputed more that 10 chars
-                text = text.slice(0,10) //cut the end off
-                text = text + "..." //and replace it with ...
-            }
+        popup.input("Name", "what is the name of the player who will use Xs?", function(text){
             $("#xName").html(text)
-            popup.input("Name", "what is the player who will use Os name?", function(text){
-                if(text.length > 10){ //if the name player two inputed more that 10 chars
-                    text = text.slice(0,10) //cut the end off
-                    text = text + "..." //and replace it with ...
-                }
+            popup.input("Name", "what is the name of the player who will use Os?", function(text){
                 $("#oName").html(text)
                 inMenu = false
             })
@@ -66,8 +59,23 @@ function main(event){
             if(winnerCheck == "x" || winnerCheck == "o"){
                 inMenu = true
                 $("#"+winnerCheck+"Score").html(Number($("#"+winnerCheck+"Score").html())+1)
-                popup.alert("WINNER", "The winner is "+winnerCheck, "play again", function(){
+                var message = "The winner is "
+                message += $("#"+winnerCheck+"Name").html() //add the winners name
+                message += "<br>" 
+                message += $("#"+(whoGoesFirst=="x"&&"o"||"x")+"Name").html() //add os name if whoGoesFirst is x and xs name if whoGoesFirst is o
+                message += " will start next round"
+                popup.alert("WINNER", message, "play again", function(){
+                    if(whoGoesFirst == "x"){
+                        whoGoesFirst = "o"
+                    }else{
+                        whoGoesFirst = "x"
+                    }
                     clear_grid()
+                    if(whoGoesFirst == "o" && ai){
+                        ai_move()
+                    }else if(whoGoesFirst == "o"){
+                        turn = "0"
+                    }
                     inMenu = false
                 })
             }
@@ -75,8 +83,20 @@ function main(event){
                 inMenu = true
                 $("#oScore").html(Number($("#oScore").html())+1)
                 $("#xScore").html(Number($("#xScore").html())+1)
-                popup.alert("TIE", "The game is tied", "play again", function(){
+                var message = "The game is tied"
+                message += "<br>" 
+                message += $("#"+(whoGoesFirst=="x"&&"o"||"x")+"Name").html() //add os name if whoGoesFirst is x and xs name if whoGoesFirst is o
+                message += " will start next round"
+                popup.alert("TIE", message, "play again", function(){
+                    if(whoGoesFirst == "x"){
+                        whoGoesFirst = "o"
+                    }else{
+                        whoGoesFirst = "x"
+                    }
                     clear_grid()
+                    if(whoGoesFirst == "o" && ai){
+                        ai_move()
+                    }
                     inMenu = false
                 })
             }
@@ -203,4 +223,7 @@ function clear_grid(){
         ctx.lineTo(CANVAS_SIZE/3*i, CANVAS_SIZE)
     }
     ctx.stroke()
+}
+function restart(){
+    location.reload()
 }
