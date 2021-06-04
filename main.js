@@ -22,6 +22,7 @@ function init(){
             $("#xName").html(text)
             popup.input("Name", "what is the name of the player who will use Os?", function(text){
                 $("#oName").html(text)
+                popup.alert("", $("#xName").html()+" will play first","ok")
                 inMenu = false
             })
         })
