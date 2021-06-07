@@ -13,8 +13,9 @@ function init(){
     popup.confirm("Player Count", "how many players do you want?", "one", "two", 
     function(){ //if the player chooses one
         ai = true //whether the second player is an ai
-        inMenu = false
-        popup.alert("", "you are X, you move first.", "start game")
+        popup.alert("", "you are X, you move first.", "start game", function(){
+            inmenu = false
+        })
     },
     function(){ //if the player chooses two
         ai = false //whether the second player is an ai
