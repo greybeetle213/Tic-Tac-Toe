@@ -32,8 +32,9 @@ function init(){
                     text = text + "..." //and replace it with ...
                 }
                 $("#oName").html(text)
-                popup.alert("", $("#xName").html()+" will play first","ok")
-                inMenu = false
+                popup.alert("", $("#xName").html()+" will play first","ok", function(){
+                    inMenu = false
+                })
             })
         })
     })
