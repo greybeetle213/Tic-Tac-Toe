@@ -14,7 +14,7 @@ function init(){
     function(){ //if the player chooses one
         ai = true //whether the second player is an ai
         popup.alert("", "you are X, you move first.", "start game", function(){
-            inmenu = false
+            inMenu = false
         })
     },
     function(){ //if the player chooses two
