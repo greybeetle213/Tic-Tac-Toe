@@ -1,4 +1,11 @@
-
+// i made this a separate file because i might want to use it for another project and this will make it easier
+// it makes a popup
+/* sample usage
+popup.alert("hi", "this is a popup", "ok", "function(){console.log("popup has been closed")}")
+popup.alert("hi", "this is a popup", "ok")
+popup.confirm("hi", "yes or no", "yes", "no", function(){console.log("yes")}, function(){console.log("no")})
+popup.input("hi", "what is your name", function(name){console.log("hello "+name)})
+*/
 function closePopup (popUpFunction) {
   $('#popup').css('visibility', 'hidden') // close the popup
   if (popUpFunction !== '') { // if a function has been given

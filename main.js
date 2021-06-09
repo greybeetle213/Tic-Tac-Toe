@@ -1,13 +1,26 @@
-function init () {
+/*
+  this is tic tac toe
+  made by bob haywood for NCEA LEVEL 2 PROGRAMING
+  it can be played by one player against an ai or two players on the same computer
+  init - runs when the body loads
+  main - runs every time someone clicks on the canvas
+  winner - returns who has won if anyone
+  aiMove - returns the ais move
+  clearGrid - clears the grid
+  restart - reloads the page
+  i also made the popup file which provides a function used for asking how many players you want, asking for the players names,
+  telling you who goes first and telling you who wins.
+*/
+function init () { // called when he body loads
   CANVAS_SIZE = window.innerHeight - 10 // setup canvas
-  document.getElementById('screen').height = CANVAS_SIZE
-  document.getElementById('screen').width = CANVAS_SIZE
+  document.getElementById('screen').height = CANVAS_SIZE // make the canvas square
+  document.getElementById('screen').width = CANVAS_SIZE // make the canvas sqaure
   ctx = document.getElementById('screen').getContext('2d')
   ctx.fillStyle = 'black'
   ctx.lineWidth = CANVAS_SIZE / 100
   turn = 'x' // whether X or O is playing this turn
   $('#screen').click(function (event) { main(event) }) // run the main function when the canvas is click
-  inMenu = true
+  inMenu = true // when this is true main will not run
   whoGoesFirst = 'x' // changes every round
   clearGrid()
   popup.confirm('Player Count', 'how many players do you want?', 'one', 'two',
@@ -37,7 +50,7 @@ function init () {
       })
     })
 }
-function main (event) {
+function main (event) { // runs whenever there is click on the canvas
   if (!inMenu) {
     x = event.pageX - $('#screen').offset().left // get the x pos relitive to the canvas
     y = event.pageY
@@ -113,6 +126,8 @@ function main (event) {
     }
   }
 }
+
+// this checks if there are any lines
 function winner (board) { // returns the winner, tie, or 0
   let symbolToCheck = 'x'
   for (check = 0; check < 2; check++) {
@@ -155,7 +170,15 @@ function winner (board) { // returns the winner, tie, or 0
   }
   return ('tie') // if nothing has been returned up to this point return that the game cannot be won
 }
-function aiMove () {
+/* THIS IS HOW THE AI THINKS:
+prioritise cells by giving them the following points:
+If you will win by playing in a cell add 1000
+If your opponent will win by playing in a cell add 500
+If the following turn there will be any space you can play in and win, add 150 for each such space.
+If the following turn there will be any space the player can play in and win, add 100 for each such space.
+If two or more spaces have the same priority choose between them randomly
+This algorithm plays optamaly while only looking two turns ahead. It is still possible to beat but i meant to do that because it makes it more fun. */
+function aiMove () { // makes the ais move
   const Spaces = []
   let maxScore = 0
   let tempGrid // fake grid
@@ -217,7 +240,7 @@ function aiMove () {
   ctx.stroke()
   grid[space[0]][space[1]] = 'o' // record where the ai played an o
 }
-function clearGrid () {
+function clearGrid () { // clears the grid
   grid = [
     [0, 0, 0],
     [0, 0, 0],
@@ -233,6 +256,6 @@ function clearGrid () {
   }
   ctx.stroke()
 }
-function restart () {
+function restart () { // restarts the game
   location.reload()
 }
